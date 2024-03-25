@@ -4,6 +4,7 @@ use axiom_circuit::input::raw_input::RawInput;
 use axiom_circuit::{
     axiom_eth::halo2curves::ff::Field, input::flatten::FixLenVec, subquery::HeaderField,
 };
+use axiom_sdk::ethers::types::H256;
 use axiom_sdk::{
     axiom::{AxiomAPI, AxiomComputeFn, AxiomComputeInput, AxiomResult},
     cmd::run_cli,
@@ -15,9 +16,16 @@ use axiom_sdk::{
     },
     Fr,
 };
+use lazy_static::lazy_static;
 
 const N: usize = 10;
-const ENS_CONTRACT_ADDR: &str = "0x74b4f05c75b47035bfc41bda77440f9c6c05e5ae";
+const ENS_CONTRACT_ADDR: &str = "0xfed6a969aaa60e4961fcd3ebf1a2e8913ac65b72";
+
+lazy_static! {
+    static ref REGISTRATION_EVENT_SCHEMA: H256 =
+        H256::from_str("0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9")
+            .unwrap();
+}
 
 #[AxiomComputeInput]
 pub struct ENSReferralInput {
@@ -101,7 +109,7 @@ impl AxiomComputeFn for ENSReferralInput {
             let expires_256 = api
                 .get_receipt(assigned_inputs.block_numbers[i], assigned_inputs.tx_idxs[i])
                 .log(assigned_inputs.log_idxs[i])
-                .data(three, None);
+                .data(three, Some(REGISTRATION_EVENT_SCHEMA.clone()));
             let expires = api.from_hi_lo(expires_256);
             let now_256 = api
                 .get_header(assigned_inputs.block_numbers[i])
@@ -188,8 +196,8 @@ impl AxiomComputeFn for ENSReferralInput {
             let is_four = gate.is_equal(api.ctx(), len, four);
             let indicator = vec![is_full_price, is_four, is_three];
 
-            let (three_char_scaled_price, _) = api.range.div_mod(api.ctx(), amount, 128u64, 40);
-            let (four_char_scaled_price, _) = api.range.div_mod(api.ctx(), amount, 32u64, 40);
+            let (three_char_scaled_price, _) = api.range.div_mod(api.ctx(), amount, 128u64, 80);
+            let (four_char_scaled_price, _) = api.range.div_mod(api.ctx(), amount, 32u64, 80);
             let prices = vec![amount, four_char_scaled_price, three_char_scaled_price];
 
             let scaled_price = gate.select_by_indicator(api.ctx(), prices, indicator);
@@ -211,6 +219,5 @@ impl AxiomComputeFn for ENSReferralInput {
 }
 
 fn main() {
-    env_logger::init();
     run_cli::<ENSReferralInput>();
 }

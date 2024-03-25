@@ -49,6 +49,7 @@ export const circuit = async ({
 
   const MAX_CLAIMS = 10;
   const ENS_CONTRACT_ADDR = "0xfed6a969aaa60e4961fcd3ebf1a2e8913ac65b72";
+  const REGISTRATION_EVENT_SCHEMA = "0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9";
 
   let numClaimsVal = Number(numClaims.value());
   if (numClaimsVal > MAX_CLAIMS) {
@@ -93,7 +94,7 @@ export const circuit = async ({
   //event: https://sepolia.etherscan.io/tx/0x7ae7706dad2b081ffb63c2e8b5fcada3964918f1c86357e3dcd37fbd993e0b4a
   //NameRegistered (string name, index_topic_1 bytes32 label, index_topic_2 address owner, uint256 baseCost, uint256 premium, uint256 expires)
   for (let i = 0; i < MAX_CLAIMS; i++) {
-    let expires = (await getReceipt(blockNumbers[i], txIdxs[i]).log(logIdxs[i]).data(3)).toCircuitValue();
+    let expires = (await getReceipt(blockNumbers[i], txIdxs[i]).log(logIdxs[i]).data(3, REGISTRATION_EVENT_SCHEMA)).toCircuitValue();
     let now = (await getHeader(blockNumbers[i]).timestamp()).toCircuitValue();
     let duration = sub(expires, now);
     let referrerIdFromDuration = mod(duration, 86400, "50", "20");
