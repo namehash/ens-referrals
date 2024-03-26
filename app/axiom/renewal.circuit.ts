@@ -49,6 +49,7 @@ export const circuit = async ({
 
   const MAX_CLAIMS = 9;
   const ENS_CONTRACT_ADDR = "0xFED6a969AaA60E4961FCD3EBF1A2e8913ac65B72";
+  const RENEWAL_EVENT_SCHEMA = "0x3da24c024582931cfaf8267d8ed24d13a82a8068d5bd337d30ec45cea4e506ae";
 
   let numClaimsVal = Number(numClaims.value());
   if (numClaimsVal > MAX_CLAIMS) {
@@ -93,7 +94,7 @@ export const circuit = async ({
   //event: https://sepolia.etherscan.io/tx/0xcae128087515abfcff4731ccd815f2c19611f882842c030af1e1bdb6e485af97#eventlog
   //NameRenewed (string name, index_topic_1 bytes32 label, uint256 cost, uint256 expires)
   for (let i = 0; i < MAX_CLAIMS; i++) {
-    let expires = (await getReceipt(blockNumbers[i], txIdxs[i]).log(logIdxs[i]).data(2)).toCircuitValue();
+    let expires = (await getReceipt(blockNumbers[i], txIdxs[i]).log(logIdxs[i]).data(2, RENEWAL_EVENT_SCHEMA)).toCircuitValue();
     let referrerIdFromExpires = mod(expires, 86400, "50", "20");
 
     if (i === 0) {
