@@ -23,7 +23,7 @@ const ENS_CONTRACT_ADDR: &str = "0xfed6a969aaa60e4961fcd3ebf1a2e8913ac65b72";
 
 lazy_static! {
     static ref REGISTRATION_EVENT_SCHEMA: H256 =
-        H256::from_str("0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9")
+        H256::from_str("0x69e37f151eb98a09618ddaa80c8cfaf1ce5996867c489f45b555b412271ebf27")
             .unwrap();
 }
 

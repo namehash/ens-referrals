@@ -49,7 +49,7 @@ export const circuit = async ({
 
   const MAX_CLAIMS = 10;
   const ENS_CONTRACT_ADDR = "0xfed6a969aaa60e4961fcd3ebf1a2e8913ac65b72";
-  const REGISTRATION_EVENT_SCHEMA = "0xb3d987963d01b2f68493b4bdb130988f157ea43070d4ad840fee0466ed9370d9";
+  const REGISTRATION_EVENT_SCHEMA = "0x69e37f151eb98a09618ddaa80c8cfaf1ce5996867c489f45b555b412271ebf27";
 
   let numClaimsVal = Number(numClaims.value());
   if (numClaimsVal > MAX_CLAIMS) {
