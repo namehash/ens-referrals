@@ -1,6 +1,3 @@
 [submodule "lib/axiom-std"]
 	path = lib/axiom-std
 	url = https://github.com/axiom-crypto/axiom-std
-[submodule "lib/axiom-incentives"]
-	path = lib/axiom-incentives
-	url = https://github.com/axiom-crypto/axiom-incentives
