@@ -100,4 +100,24 @@ contract ENSReferralsTest is AxiomTest {
             "Last claim ID not updated"
         );
     }
+
+    function test_cantDoubleClaim() public {
+        Query memory q = query(renewalQuerySchema, abi.encode(renewalInput), address(referrals));
+        q.send();
+
+        bytes32[] memory results = q.prankFulfill();
+        require(
+            referrals.lastClaimedId(renewalQuerySchema, uint16(uint160(uint256(results[2])))) == uint256(results[1]),
+            "Last claim ID not updated"
+        );
+
+        FulfillCallbackArgs memory args = axiomVm.fulfillCallbackArgs(
+            q.querySchema, q.input, q.callbackTarget, q.callbackExtraData, q.feeData, msg.sender
+        );
+        vm.prank(axiomV2QueryAddress);
+        vm.expectRevert("Already claimed");
+        IAxiomV2Client(args.callbackTarget).axiomV2Callback{ gas: args.gasLimit }(
+            args.sourceChainId, args.caller, args.querySchema, args.queryId, args.axiomResults, args.callbackExtraData
+        );
+    }
 }
