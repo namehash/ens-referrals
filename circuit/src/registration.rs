@@ -7,7 +7,6 @@ use axiom_circuit::{
 use axiom_sdk::ethers::types::H256;
 use axiom_sdk::{
     axiom::{AxiomAPI, AxiomComputeFn, AxiomComputeInput, AxiomResult},
-    cmd::run_cli,
     ethers::abi::Address,
     halo2_base::{
         gates::{GateInstructions, RangeInstructions},
@@ -28,17 +27,17 @@ lazy_static! {
 }
 
 #[AxiomComputeInput]
-pub struct ENSReferralInput {
+pub struct ENSRegistrationInput {
     pub block_numbers: FixLenVec<usize, N>,
     pub tx_idxs: FixLenVec<usize, N>,
     pub log_idxs: FixLenVec<usize, N>,
     pub num_claims: usize,
 }
 
-impl AxiomComputeFn for ENSReferralInput {
+impl AxiomComputeFn for ENSRegistrationInput {
     fn compute(
         api: &mut AxiomAPI,
-        assigned_inputs: ENSReferralCircuitInput<AssignedValue<Fr>>,
+        assigned_inputs: ENSRegistrationCircuitInput<AssignedValue<Fr>>,
     ) -> Vec<AxiomResult> {
         let gate = api.range.gate();
         let two_pow_64 = gate.pow_of_two[64];
@@ -96,7 +95,7 @@ impl AxiomComputeFn for ENSReferralInput {
         let five = api.ctx().load_constant(Fr::from(5u64));
         let four = api.ctx().load_constant(Fr::from(4u64));
         let six = api.ctx().load_constant(Fr::from(6u64));
-        let byte_checks = vec![0x80, 0xe0, 0xf0, 0xf8, 0xfc]
+        let byte_checks = [0x80, 0xe0, 0xf0, 0xf8, 0xfc]
             .iter()
             .map(|x| api.ctx().load_constant(Fr::from(*x as u64)))
             .collect::<Vec<_>>();
@@ -109,7 +108,7 @@ impl AxiomComputeFn for ENSReferralInput {
             let expires_256 = api
                 .get_receipt(assigned_inputs.block_numbers[i], assigned_inputs.tx_idxs[i])
                 .log(assigned_inputs.log_idxs[i])
-                .data(three, Some(REGISTRATION_EVENT_SCHEMA.clone()));
+                .data(three, Some(*REGISTRATION_EVENT_SCHEMA));
             let expires = api.from_hi_lo(expires_256);
             let now_256 = api
                 .get_header(assigned_inputs.block_numbers[i])
@@ -216,8 +215,4 @@ impl AxiomComputeFn for ENSReferralInput {
             volume.into(),
         ]
     }
-}
-
-fn main() {
-    run_cli::<ENSReferralInput>();
 }

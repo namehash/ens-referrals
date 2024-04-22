@@ -5,7 +5,6 @@ use axiom_circuit::{axiom_eth::halo2curves::ff::Field, input::flatten::FixLenVec
 use axiom_sdk::ethers::types::H256;
 use axiom_sdk::{
     axiom::{AxiomAPI, AxiomComputeFn, AxiomComputeInput, AxiomResult},
-    cmd::run_cli,
     ethers::abi::Address,
     halo2_base::{
         gates::{GateInstructions, RangeInstructions},
@@ -26,17 +25,17 @@ lazy_static! {
 }
 
 #[AxiomComputeInput]
-pub struct ENSReferralInput {
+pub struct ENSRenewalInput {
     pub block_numbers: FixLenVec<usize, N>,
     pub tx_idxs: FixLenVec<usize, N>,
     pub log_idxs: FixLenVec<usize, N>,
     pub num_claims: usize,
 }
 
-impl AxiomComputeFn for ENSReferralInput {
+impl AxiomComputeFn for ENSRenewalInput {
     fn compute(
         api: &mut AxiomAPI,
-        assigned_inputs: ENSReferralCircuitInput<AssignedValue<Fr>>,
+        assigned_inputs: ENSRenewalCircuitInput<AssignedValue<Fr>>,
     ) -> Vec<AxiomResult> {
         let gate = api.range.gate();
         let two_pow_64 = gate.pow_of_two[64];
@@ -94,7 +93,7 @@ impl AxiomComputeFn for ENSReferralInput {
         let three = api.ctx().load_constant(Fr::from(3u64));
         let four = api.ctx().load_constant(Fr::from(4u64));
         let six = api.ctx().load_constant(Fr::from(6u64));
-        let byte_checks = vec![0x80, 0xe0, 0xf0, 0xf8, 0xfc]
+        let byte_checks = [0x80, 0xe0, 0xf0, 0xf8, 0xfc]
             .iter()
             .map(|x| api.ctx().load_constant(Fr::from(*x as u64)))
             .collect::<Vec<_>>();
@@ -107,7 +106,7 @@ impl AxiomComputeFn for ENSReferralInput {
             let expires_256 = api
                 .get_receipt(assigned_inputs.block_numbers[i], assigned_inputs.tx_idxs[i])
                 .log(assigned_inputs.log_idxs[i])
-                .data(two, Some(RENEWAL_EVENT_SCHEMA.clone()));
+                .data(two, Some(*RENEWAL_EVENT_SCHEMA));
             let expires = api.from_hi_lo(expires_256);
             let (_, referrer_id_from_expires) = api.range.div_mod(api.ctx(), expires, 86400u64, 64);
 
@@ -207,8 +206,4 @@ impl AxiomComputeFn for ENSReferralInput {
             volume.into(),
         ]
     }
-}
-
-fn main() {
-    run_cli::<ENSReferralInput>();
 }
