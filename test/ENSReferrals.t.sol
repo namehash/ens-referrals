@@ -115,7 +115,7 @@ contract ENSReferralsTest is AxiomTest {
             q.querySchema, q.input, q.callbackTarget, q.callbackExtraData, q.feeData, msg.sender
         );
         vm.prank(axiomV2QueryAddress);
-        vm.expectRevert();
+        vm.expectRevert("Already claimed");
         IAxiomV2Client(args.callbackTarget).axiomV2Callback{ gas: args.gasLimit }(
             args.sourceChainId, args.caller, args.querySchema, args.queryId, args.axiomResults, args.callbackExtraData
         );
