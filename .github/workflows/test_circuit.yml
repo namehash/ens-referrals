@@ -1,11 +1,10 @@
 name: Test
 
 on:
-  workflow_dispatch:
-  pull_request:
   push:
     branches:
-      - "**"
+      - main
+  pull_request:
 
 jobs:
   rust-circuit:
@@ -15,9 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build rust client
+        working-directory: ./circuit
         run: |
           cargo build --verbose
       - name: Test rust client
+        working-directory: ./circuit
         run: |
           export PROVIDER_URI=${{ secrets.PROVIDER_URI_SEPOLIA }}
           cargo test
