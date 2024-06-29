@@ -1,4 +1,4 @@
-use axiom_sdk::cmd::run_cli;
+use axiom_sdk::cli::run_cli;
 use circuit::renewal::ENSRenewalInput;
 
 fn main() {
