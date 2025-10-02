@@ -2,7 +2,7 @@
 
 This repository contains smart contracts for tracking referral information during .eth subdomain domain renewals. Three different approaches are implemented to illustrate various tradeoffs.
 
-**All** of these contract implementations are able to renew _any_ direct .eth subname with included referrer information. They differ in their approaches to indexer ergonomics and gas costs, primarily. Integrating apps could _optionally_ check the wrapped status of a name and switch between a `UniversalRegistrarRenewal*.renew()` and `UnwrappedEthRegistrarController.renew()` to save users the gas cost difference on their renewal transaction.
+**All** of these contract implementations are able to renew _any_ direct .eth subname with included referrer information, regardless of the EthRegistrarController they were originally registered with. They differ in their approaches to indexer ergonomics and gas costs. Integrating apps need only send direct .eth subname renewal transactions through `UniversalRegistrarRenewal*.renew()` to ensure their referral information is included for all renewals. Integrating apps could _optionally_ check the wrapped status of a name and switch between `UniversalRegistrarRenewal*.renew()` and `UnwrappedEthRegistrarController.renew()` to save users the gas cost difference on their renewal transaction.
 
 For reference, `WrappedETHRegistrarController.renew()` costs ~88k gas.
 
