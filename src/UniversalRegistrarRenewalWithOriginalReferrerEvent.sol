@@ -7,7 +7,7 @@ import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.s
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
 /**
- * @title UniversalRegistrarRenewalWithReferrer
+ * @title UniversalRegistrarRenewalWithOriginalReferrerEvent
  * @notice A universal renewal contract that works with both wrapped and unwrapped .eth subnames while
  * tracking referrals.
  *
@@ -23,10 +23,9 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * This approach ensures that both wrapped and unwrapped names are properly renewed with a single
  * transaction, maintaining consistency across the ENS ecosystem while preserving referral data.
  *
- * @dev This contract is Ownable to enable future Enscribe compatibility for on-chain management.
- *      See: https://www.enscribe.xyz
+ * @dev This contract is Ownable to enable future contract naming compatibility.
  */
-contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithOriginalReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     IETHRegistrarController immutable UNWRAPPED_ETH_REGISTRAR_CONTROLLER;
 
@@ -40,7 +39,7 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
 
     /**
      * @notice Renews an ENS name with referral tracking
-     * @param label The label of the ENS name to renew
+     * @param label The label of the .eth subname to renew
      * @param duration The duration to extend the registration
      * @param referrer The referrer for tracking purposes
      * @dev Gas usage: ~129k
@@ -50,6 +49,9 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
         UNWRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration, referrer);
 
         // 2. bump the WrappedEthRegistrarController so NameWrapper gets the new expiry
+        // NOTE: NameWrapper.renew() calls BaseRegistrar.renew() and then no-ops if name is not wrapped.
+        // Combined with a 0 duration, if a name is wrapped, the NameWrapper updates its internal expiry
+        // correctly, fetching the latest value from the BaseRegistrar.
         WRAPPED_ETH_REGISTRAR_CONTROLLER.renew(label, 0);
 
         // 3. refund msg.sender any leftover balance

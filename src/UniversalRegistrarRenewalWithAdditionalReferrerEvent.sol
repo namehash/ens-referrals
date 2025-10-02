@@ -8,7 +8,7 @@ import {IPriceOracle} from "ens-contracts/ethregistrar/IPriceOracle.sol";
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
 /**
- * @title WrappedRegistrarRenewalWithReferral
+ * @title UniversalRegistrarRenewalWithAdditionalReferrerEvent
  * @notice A contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
  *
  * This contract enables ENS name renewals through the wrapped registrar controller while tracking
@@ -20,10 +20,9 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * 4. Emitting a NameRenewed event that includes referral data for tracking purposes
  * 5. Refunding any excess payment back to the caller
  *
- * @dev This contract is Ownable to enable future Enscribe compatibility for on-chain management.
- *      See: https://www.enscribe.xyz
+ * @dev This contract is Ownable to enable future contract naming compatibility.
  */
-contract WrappedRegistrarRenewalWithReferral is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithAdditionalReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     INameWrapper immutable NAME_WRAPPER;
 
@@ -45,7 +44,7 @@ contract WrappedRegistrarRenewalWithReferral is IRegistrarRenewalWithReferral, O
 
     /**
      * @notice Renews an ENS name with referral tracking
-     * @param label The label of the ENS name to renew
+     * @param label The label of the .eth subname to renew
      * @param duration The duration to extend the registration
      * @param referrer The referrer for tracking purposes
      * @dev Gas usage: ~136k

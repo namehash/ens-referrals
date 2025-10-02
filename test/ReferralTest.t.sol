@@ -10,9 +10,9 @@ import {IPriceOracle} from "ens-contracts/ethregistrar/IPriceOracle.sol";
 import {NameCoder} from "ens-contracts/utils/NameCoder.sol";
 
 import {IWrappedEthRegistrarController} from "../src/IWrappedEthRegistrarController.sol";
-import {UniversalRegistrarRenewalWithReferrer} from "../src/UniversalRegistrarRenewalWithReferrer.sol";
-import {WrappedRegistrarRenewalWithReferral} from "../src/WrappedRegistrarRenewalWithReferral.sol";
-import {SimpleWrappedRegistrarRenewal} from "../src/SimpleWrappedRegistrarRenewal.sol";
+import {UniversalRegistrarRenewalWithOriginalReferrerEvent} from "../src/UniversalRegistrarRenewalWithOriginalReferrerEvent.sol";
+import {UniversalRegistrarRenewalWithAdditionalReferrerEvent} from "../src/UniversalRegistrarRenewalWithAdditionalReferrerEvent.sol";
+import {UniversalRegistrarRenewalWithSimpleReferrerEvent} from "../src/UniversalRegistrarRenewalWithSimpleReferrerEvent.sol";
 
 contract ReferralsTest is Test {
     INameWrapper constant NAME_WRAPPER = INameWrapper(0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401);
@@ -22,26 +22,34 @@ contract ReferralsTest is Test {
         IETHRegistrarController(0x59E16fcCd424Cc24e280Be16E11Bcd56fb0CE547);
     IBaseRegistrar constant BASE_REGISTRAR = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
 
-    string constant TEST_WRAPPED_LABEL = "scotttaylor";
-    string constant TEST_UNWRAPPED_LABEL = "daonotes";
+    // registered via LegacyEthRegistrarController
     string constant TEST_LEGACY_LABEL = "shrugs";
+
+    // registered via WrappedEthRegistrarController
+    string constant TEST_WRAPPED_LABEL = "scotttaylor";
+
+    // registered via UnwrappedEthRegistrarController
+    string constant TEST_UNWRAPPED_LABEL = "daonotes";
+
     uint256 constant TEST_DURATION = 365 days;
+
+    // forge-lint: disable-next-line(mixed-case-variable)
     bytes32 REFERRER = keccak256("test-referrer"); // TODO: referrer formatting
 
-    UniversalRegistrarRenewalWithReferrer universalRenewal;
-    WrappedRegistrarRenewalWithReferral wrappedRenewal;
-    SimpleWrappedRegistrarRenewal simpleWrappedRenewal;
+    UniversalRegistrarRenewalWithOriginalReferrerEvent universalRenewal;
+    UniversalRegistrarRenewalWithAdditionalReferrerEvent wrappedRenewal;
+    UniversalRegistrarRenewalWithSimpleReferrerEvent simpleWrappedRenewal;
 
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
 
-        universalRenewal = new UniversalRegistrarRenewalWithReferrer(
+        universalRenewal = new UniversalRegistrarRenewalWithOriginalReferrerEvent(
             WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER
         );
 
-        wrappedRenewal = new WrappedRegistrarRenewalWithReferral(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
+        wrappedRenewal = new UniversalRegistrarRenewalWithAdditionalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
 
-        simpleWrappedRenewal = new SimpleWrappedRegistrarRenewal(WRAPPED_ETH_REGISTRAR_CONTROLLER);
+        simpleWrappedRenewal = new UniversalRegistrarRenewalWithSimpleReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER);
     }
 
     function test_renewWrappedName() public {
@@ -127,7 +135,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event
         vm.expectEmit(true, true, true, true);
-        emit SimpleWrappedRegistrarRenewal.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER);
+        emit UniversalRegistrarRenewalWithSimpleReferrerEvent.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER);
 
         // Renew
         simpleWrappedRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);

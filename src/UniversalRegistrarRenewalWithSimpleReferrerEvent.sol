@@ -6,7 +6,7 @@ import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.s
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
 /**
- * @title SimpleWrappedRegistrarRenewal
+ * @title UniversalRegistrarRenewalWithSimpleReferrerEvent
  * @notice A simplified contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
  *
  * This contract provides a simplified renewal process that:
@@ -20,12 +20,12 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * event in the same transaction for the specified label in order to determine the duration referred
  * to attribute to the referrer in question.
  */
-contract SimpleWrappedRegistrarRenewal is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithSimpleReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
 
     /// @notice Emitted when a name is renewed with a referrer.
     ///
-    /// @param label The label of the name.
+    /// @param label The label of the .eth subname
     /// @param referrer The referrer of the registration.
     event RenewalReferred(string label, bytes32 referrer);
 
@@ -35,7 +35,7 @@ contract SimpleWrappedRegistrarRenewal is IRegistrarRenewalWithReferral, Ownable
 
     /**
      * @notice Renews an ENS name with referral tracking
-     * @param label The label of the ENS name to renew
+     * @param label The label of the .eth subname to renew
      * @param duration The duration to extend the registration
      * @param referrer The referrer for tracking purposes
      * @dev Gas usage: ~109k

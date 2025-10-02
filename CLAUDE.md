@@ -10,17 +10,17 @@ This is a Foundry-based Solidity project for ENS referrals smart contracts. The 
 
 The project consists of two main renewal contracts:
 
-### UniversalRegistrarRenewalWithReferrer
+### UniversalRegistrarRenewalWithOriginalReferrerEvent
 - **Purpose**: Universal renewal contract that works with both wrapped and unwrapped .eth names
 - **Strategy**: Renews through unwrapped ETHRegistrarController (for referral tracking) then synchronizes with WrappedEthRegistrarController
 - **Key Dependencies**: `IETHRegistrarController`, `IWrappedEthRegistrarController`
 
-### WrappedRegistrarRenewalWithReferral
+### UniversalRegistrarRenewalWithAdditionalReferrerEvent
 - **Purpose**: Dedicated renewal contract for wrapped .eth names with referral tracking
 - **Strategy**: Calculates price, renews through WrappedEthRegistrarController, emits referral events
 - **Key Dependencies**: `IWrappedEthRegistrarController`, `INameWrapper`
 
-Both contracts implement `IRegistrarRenewalWithReferral` interface and are Ownable for future Enscribe compatibility.
+Both contracts implement `IRegistrarRenewalWithReferral` interface and are Ownable for future contract naming compatibility.
 
 ## Core Commands
 
