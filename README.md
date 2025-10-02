@@ -48,14 +48,6 @@ interface IRegistrarRenewalWithReferral {
 }
 ```
 
-## Gas Cost Comparison
-
-| Contract | Gas Cost |
-|----------|----------|
-| UniversalRegistrarRenewalWithSimpleReferrerEvent | ~109k |
-| UniversalRegistrarRenewalWithOriginalReferrerEvent | ~129k |
-| UniversalRegistrarRenewalWithAdditionalReferrerEvent | ~136k |
-
 ### Quick Start
 
 ```bash
