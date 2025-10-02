@@ -7,6 +7,22 @@ import {INameWrapper} from "ens-contracts/wrapper/INameWrapper.sol";
 import {IPriceOracle} from "ens-contracts/ethregistrar/IPriceOracle.sol";
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
+/**
+ * @title WrappedRegistrarRenewalWithReferral
+ * @notice A contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
+ *
+ * This contract enables ENS name renewals through the wrapped registrar controller while tracking
+ * referral information. It achieves its goals by:
+ *
+ * 1. Calculating the instantaneous renewal price using the WrappedEthRegistrarController
+ * 2. Executing the renewal through the WrappedEthRegistrarController with the provided payment
+ * 3. Retrieving the updated expiry time from the NameWrapper contract
+ * 4. Emitting a NameRenewed event that includes referral data for tracking purposes
+ * 5. Refunding any excess payment back to the caller
+ *
+ * @dev This contract is Ownable to enable future Enscribe compatibility for on-chain management.
+ *      See: https://www.enscribe.xyz
+ */
 contract WrappedRegistrarRenewalWithReferral is
     IRegistrarRenewalWithReferral,
     Ownable
@@ -37,6 +53,13 @@ contract WrappedRegistrarRenewalWithReferral is
         NAME_WRAPPER = _nameWrapper;
     }
 
+    /**
+     * @notice Renews an ENS name with referral tracking
+     * @param label The label of the ENS name to renew
+     * @param duration The duration to extend the registration
+     * @param referrer The referrer for tracking purposes
+     * @dev Gas usage: ~136k
+     */
     function renew(
         string calldata label,
         uint256 duration,
@@ -45,9 +68,10 @@ contract WrappedRegistrarRenewalWithReferral is
         // 1. calculate instantaneous price
         IPriceOracle.Price memory price = WRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(label, duration);
 
-        // 2. WrappedEthRegistrarController#renew()
+        // 2. WrappedEthRegistrarController#renew(), which handles payment invariants
         WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration);
 
+        // forge-lint: disable-next-line(asm-keccak256)
         bytes32 labelHash = keccak256(bytes(label));
 
         // 3. Retrieve new expiry from NameWrapper
@@ -61,4 +85,6 @@ contract WrappedRegistrarRenewalWithReferral is
             payable(msg.sender).transfer(address(this).balance);
         }
     }
+
+    receive() external payable {}
 }
