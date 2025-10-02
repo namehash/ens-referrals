@@ -20,10 +20,7 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * event in the same transaction for the specified label in order to determine the duration referred
  * to attribute to the referrer in question.
  */
-contract SimpleWrappedRegistrarRenewal is
-    IRegistrarRenewalWithReferral,
-    Ownable
-{
+contract SimpleWrappedRegistrarRenewal is IRegistrarRenewalWithReferral, Ownable {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
 
     /// @notice Emitted when a name is renewed with a referrer.
@@ -32,9 +29,7 @@ contract SimpleWrappedRegistrarRenewal is
     /// @param referrer The referrer of the registration.
     event RenewalReferred(string label, bytes32 referrer);
 
-    constructor(
-        IWrappedEthRegistrarController _wrappedEthRegistrarController
-    ) Ownable(msg.sender) {
+    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController) Ownable(msg.sender) {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
     }
 
@@ -45,11 +40,7 @@ contract SimpleWrappedRegistrarRenewal is
      * @param referrer The referrer for tracking purposes
      * @dev Gas usage: ~109k
      */
-    function renew(
-        string calldata label,
-        uint256 duration,
-        bytes32 referrer
-    ) external payable {
+    function renew(string calldata label, uint256 duration, bytes32 referrer) external payable {
         // 1. Call WRAPPED_ETH_REGISTRAR_CONTROLLER.renew()
         WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration);
 

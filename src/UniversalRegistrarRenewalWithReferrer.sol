@@ -26,10 +26,7 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * @dev This contract is Ownable to enable future Enscribe compatibility for on-chain management.
  *      See: https://www.enscribe.xyz
  */
-contract UniversalRegistrarRenewalWithReferrer is
-    IRegistrarRenewalWithReferral,
-    Ownable
-{
+contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral, Ownable {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     IETHRegistrarController immutable UNWRAPPED_ETH_REGISTRAR_CONTROLLER;
 
@@ -48,17 +45,9 @@ contract UniversalRegistrarRenewalWithReferrer is
      * @param referrer The referrer for tracking purposes
      * @dev Gas usage: ~129k
      */
-    function renew(
-        string calldata label,
-        uint256 duration,
-        bytes32 referrer
-    ) external payable {
+    function renew(string calldata label, uint256 duration, bytes32 referrer) external payable {
         // 1. renew the name in the latest EthRegistrarController, which emits referrer
-        UNWRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(
-            label,
-            duration,
-            referrer
-        );
+        UNWRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration, referrer);
 
         // 2. bump the WrappedEthRegistrarController so NameWrapper gets the new expiry
         WRAPPED_ETH_REGISTRAR_CONTROLLER.renew(label, 0);

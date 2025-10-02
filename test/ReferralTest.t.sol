@@ -16,8 +16,10 @@ import {SimpleWrappedRegistrarRenewal} from "../src/SimpleWrappedRegistrarRenewa
 
 contract ReferralsTest is Test {
     INameWrapper constant NAME_WRAPPER = INameWrapper(0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401);
-    IWrappedEthRegistrarController constant WRAPPED_ETH_REGISTRAR_CONTROLLER = IWrappedEthRegistrarController(0x253553366Da8546fC250F225fe3d25d0C782303b);
-    IETHRegistrarController constant UNWRAPPED_ETH_REGISTRAR_CONTROLLER = IETHRegistrarController(0x59E16fcCd424Cc24e280Be16E11Bcd56fb0CE547);
+    IWrappedEthRegistrarController constant WRAPPED_ETH_REGISTRAR_CONTROLLER =
+        IWrappedEthRegistrarController(0x253553366Da8546fC250F225fe3d25d0C782303b);
+    IETHRegistrarController constant UNWRAPPED_ETH_REGISTRAR_CONTROLLER =
+        IETHRegistrarController(0x59E16fcCd424Cc24e280Be16E11Bcd56fb0CE547);
     IBaseRegistrar constant BASE_REGISTRAR = IBaseRegistrar(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
 
     string constant TEST_WRAPPED_LABEL = "scotttaylor";
@@ -34,18 +36,12 @@ contract ReferralsTest is Test {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
 
         universalRenewal = new UniversalRegistrarRenewalWithReferrer(
-            WRAPPED_ETH_REGISTRAR_CONTROLLER,
-            UNWRAPPED_ETH_REGISTRAR_CONTROLLER
+            WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER
         );
 
-        wrappedRenewal = new WrappedRegistrarRenewalWithReferral(
-            WRAPPED_ETH_REGISTRAR_CONTROLLER,
-            NAME_WRAPPER
-        );
+        wrappedRenewal = new WrappedRegistrarRenewalWithReferral(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
 
-        simpleWrappedRenewal = new SimpleWrappedRegistrarRenewal(
-            WRAPPED_ETH_REGISTRAR_CONTROLLER
-        );
+        simpleWrappedRenewal = new SimpleWrappedRegistrarRenewal(WRAPPED_ETH_REGISTRAR_CONTROLLER);
     }
 
     function test_renewWrappedName() public {
@@ -61,7 +57,7 @@ contract ReferralsTest is Test {
         uint256 initialExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
 
         // Get initial wrapped name data
-        (, , uint64 initialWrappedExpiry) = NAME_WRAPPER.getData(tokenId);
+        (,, uint64 initialWrappedExpiry) = NAME_WRAPPER.getData(tokenId);
 
         // Calculate renewal price
         IPriceOracle.Price memory price = WRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_WRAPPED_LABEL, TEST_DURATION);
@@ -74,7 +70,7 @@ contract ReferralsTest is Test {
         assertEq(newExpiry, initialExpiry + TEST_DURATION, "BaseRegistrar expiry should be updated");
 
         // Assert NameWrapper data updated
-        (, , uint64 newWrappedExpiry) = NAME_WRAPPER.getData(tokenId);
+        (,, uint64 newWrappedExpiry) = NAME_WRAPPER.getData(tokenId);
         assertEq(newWrappedExpiry, initialWrappedExpiry + TEST_DURATION, "NameWrapper expiry should be updated");
     }
 
@@ -86,7 +82,8 @@ contract ReferralsTest is Test {
         uint256 initialExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
 
         // Calculate renewal price
-        IPriceOracle.Price memory price = UNWRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_UNWRAPPED_LABEL, TEST_DURATION);
+        IPriceOracle.Price memory price =
+            UNWRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_UNWRAPPED_LABEL, TEST_DURATION);
 
         // Renew
         universalRenewal.renew{value: price.base}(TEST_UNWRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -140,5 +137,5 @@ contract ReferralsTest is Test {
         assertEq(newExpiry, initialExpiry + TEST_DURATION, "BaseRegistrar expiry should be updated");
     }
 
-receive() external payable {}
+    receive() external payable {}
 }
