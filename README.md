@@ -4,7 +4,7 @@ This repository contains smart contracts for tracking referral information durin
 
 ## Contracts Overview
 
-### 1. UniversalRegistrarRenewalWithReferrer
+### 1. [UniversalRegistrarRenewalWithReferrer](src/UniversalRegistrarRenewalWithReferrer.sol)
 
 **Purpose**: Universal renewal contract that works with both wrapped and unwrapped .eth names
 **Strategy**: Renews through unwrapped ETHRegistrarController (for referral tracking) then synchronizes with WrappedEthRegistrarController
@@ -15,7 +15,7 @@ This repository contains smart contracts for tracking referral information durin
 - Emits single `NameRenewed` event via `UnwrappedEthRegistrarController` with renewal details and referral tracking
   - this is most straightforward for indexers
 
-### 2. WrappedRegistrarRenewalWithReferral
+### 2. [WrappedRegistrarRenewalWithReferral](src/WrappedRegistrarRenewalWithReferral.sol)
 
 **Purpose**: Dedicated renewal contract for wrapped .eth names with comprehensive referral tracking
 **Strategy**: Calculates price, renews through WrappedEthRegistrarController, retrieves updated expiry, emits detailed event
@@ -26,7 +26,7 @@ This repository contains smart contracts for tracking referral information durin
   - this is straightforward for indexers
 - Higher gas cost due to additional price calculation and expiry retrieval operations
 
-### 3. SimpleWrappedRegistrarRenewal
+### 3. [SimpleWrappedRegistrarRenewal](src/SimpleWrappedRegistrarRenewal.sol)
 
 **Purpose**: Simplified renewal contract with minimal overhead
 **Strategy**: Direct renewal call with basic referral event emission
