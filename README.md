@@ -10,7 +10,7 @@ This repository contains smart contracts for tracking referral information durin
 **Strategy**: Renews through unwrapped ETHRegistrarController (for referral tracking) then synchronizes with WrappedEthRegistrarController
 **Gas Cost**: ~129k gas for `renew()`
 
-- Works with all ENS name types (wrapped, unwrapped, legacy)
+- Works with all .eth subdomain types (wrapped, unwrapped, legacy)
 - Single contract solution for all renewal scenarios
 - Emits single `NameRenewed` event via `UnwrappedEthRegistrarController` with renewal details and referral tracking
   - this is most straightforward for indexers
