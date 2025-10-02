@@ -29,10 +29,9 @@ contract UniversalRegistrarRenewalWithOriginalReferrerEvent is IRegistrarRenewal
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     IETHRegistrarController immutable UNWRAPPED_ETH_REGISTRAR_CONTROLLER;
 
-    constructor(
-        IWrappedEthRegistrarController _wrappedEthRegistrarController,
-        IETHRegistrarController _unwrappedEthRegistrarController
-    ) Ownable(msg.sender) {
+    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController, IETHRegistrarController _unwrappedEthRegistrarController)
+        Ownable(msg.sender)
+    {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
         UNWRAPPED_ETH_REGISTRAR_CONTROLLER = _unwrappedEthRegistrarController;
     }

@@ -10,15 +10,9 @@ import {IPriceOracle} from "ens-contracts/ethregistrar/IPriceOracle.sol";
 import {NameCoder} from "ens-contracts/utils/NameCoder.sol";
 
 import {IWrappedEthRegistrarController} from "../src/IWrappedEthRegistrarController.sol";
-import {
-    UniversalRegistrarRenewalWithOriginalReferrerEvent
-} from "../src/UniversalRegistrarRenewalWithOriginalReferrerEvent.sol";
-import {
-    UniversalRegistrarRenewalWithAdditionalReferrerEvent
-} from "../src/UniversalRegistrarRenewalWithAdditionalReferrerEvent.sol";
-import {
-    UniversalRegistrarRenewalWithSimpleReferrerEvent
-} from "../src/UniversalRegistrarRenewalWithSimpleReferrerEvent.sol";
+import {UniversalRegistrarRenewalWithOriginalReferrerEvent} from "../src/UniversalRegistrarRenewalWithOriginalReferrerEvent.sol";
+import {UniversalRegistrarRenewalWithAdditionalReferrerEvent} from "../src/UniversalRegistrarRenewalWithAdditionalReferrerEvent.sol";
+import {UniversalRegistrarRenewalWithSimpleReferrerEvent} from "../src/UniversalRegistrarRenewalWithSimpleReferrerEvent.sol";
 
 contract ReferralsTest is Test {
     INameWrapper constant NAME_WRAPPER = INameWrapper(0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401);
@@ -49,12 +43,10 @@ contract ReferralsTest is Test {
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
 
-        universalRenewal = new UniversalRegistrarRenewalWithOriginalReferrerEvent(
-            WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER
-        );
+        universalRenewal =
+            new UniversalRegistrarRenewalWithOriginalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER);
 
-        wrappedRenewal =
-            new UniversalRegistrarRenewalWithAdditionalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
+        wrappedRenewal = new UniversalRegistrarRenewalWithAdditionalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
 
         simpleWrappedRenewal = new UniversalRegistrarRenewalWithSimpleReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER);
     }
@@ -97,8 +89,7 @@ contract ReferralsTest is Test {
         uint256 initialExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
 
         // Calculate renewal price
-        IPriceOracle.Price memory price =
-            UNWRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_UNWRAPPED_LABEL, TEST_DURATION);
+        IPriceOracle.Price memory price = UNWRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_UNWRAPPED_LABEL, TEST_DURATION);
 
         // Renew
         universalRenewal.renew{value: price.base}(TEST_UNWRAPPED_LABEL, TEST_DURATION, REFERRER);

@@ -35,9 +35,7 @@ contract UniversalRegistrarRenewalWithAdditionalReferrerEvent is IRegistrarRenew
     /// @param referrer The referrer of the registration.
     event NameRenewed(string label, bytes32 indexed labelhash, uint256 cost, uint256 expires, bytes32 referrer);
 
-    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController, INameWrapper _nameWrapper)
-        Ownable(msg.sender)
-    {
+    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController, INameWrapper _nameWrapper) Ownable(msg.sender) {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
         NAME_WRAPPER = _nameWrapper;
     }
