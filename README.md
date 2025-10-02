@@ -1,6 +1,10 @@
 # ENS Referrals Smart Contracts
 
-This repository contains smart contracts for tracking referral information during .eth subdomain domain renewals. Three different approaches are implemented to illustrate various tradeoffs.
+This repository contains smart contracts for tracking referral information during .eth subdomain domain renewals. The new `UnwrappedEthRegistrarController` emits a `NameRenewed` event that includes a `referrer` arg, but renewals for `NameWrapper`-wrapped names that go through the new `UnwrappedEthRegistrarController` would end up with their `NameWrapper` expiry out-of-sync with the `BaseRegistrar`'s.
+
+We remedy that issue by providing a `UniversalRegistrarRenewal*` contract that an integrating app can use to renew direct subnames of .eth that
+1. allows for the inclusion of the `referrer` arg, even for `NameWrapper`-wrapped names, and
+2. ensures that `NameWrapper`-wrapped names synchronize their expiry with that of the `BaseRegistrar`.
 
 **All** of these contract implementations are able to renew _any_ direct .eth subname with included referrer information, regardless of the EthRegistrarController they were originally registered with. They differ in their approaches to indexer ergonomics and gas costs. Integrating apps need only send direct .eth subname renewal transactions through `UniversalRegistrarRenewal*.renew()` to ensure their referral information is included for all renewals. Integrating apps could _optionally_ check the wrapped status of a name and switch between `UniversalRegistrarRenewal*.renew()` and `UnwrappedEthRegistrarController.renew()` to save users the gas cost difference on their renewal transaction.
 
@@ -14,6 +18,8 @@ For reference, `WrappedETHRegistrarController.renew()` costs ~88k gas.
 **Gas Cost**: ~129k gas for `renew()` (+41k gas @ 1 gwei @ $4500 ETH = +$0.18 per renew tx)
 
 This is the most straightforward approach: the single source-of-truth `NameRenewed` event on the `UnwrappedEthRegistrarController` is very ergonomic to index, and the additional cost-per-call is only +41k gas (+$0.18 at current pricing).
+
+**This is the approach we recommend, as it is the cleanest solution and avoids the need for more complicated indexing semantics.**
 
 ### 2. [UniversalRegistrarRenewalWithAdditionalReferrerEvent](src/UniversalRegistrarRenewalWithAdditionalReferrerEvent.sol)
 
