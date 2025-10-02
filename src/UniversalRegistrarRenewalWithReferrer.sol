@@ -3,21 +3,11 @@ pragma solidity ~0.8.17;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IETHRegistrarController} from "ens-contracts/ethregistrar/IETHRegistrarController.sol";
-
-interface IWrappedEthRegistrarController {
-    function renew(string calldata name, uint256 duration) external payable;
-}
-
-interface IUniversalRegistrarRenewalWithReferrer {
-    function renew(
-        string calldata label,
-        uint256 duration,
-        bytes32 referrer
-    ) external payable;
-}
+import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.sol";
+import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
 contract UniversalRegistrarRenewalWithReferrer is
-    IUniversalRegistrarRenewalWithReferrer,
+    IRegistrarRenewalWithReferral,
     Ownable
 {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
