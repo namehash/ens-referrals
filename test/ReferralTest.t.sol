@@ -12,6 +12,7 @@ import {NameCoder} from "ens-contracts/utils/NameCoder.sol";
 import {IWrappedEthRegistrarController} from "../src/IWrappedEthRegistrarController.sol";
 import {UniversalRegistrarRenewalWithReferrer} from "../src/UniversalRegistrarRenewalWithReferrer.sol";
 import {WrappedRegistrarRenewalWithReferral} from "../src/WrappedRegistrarRenewalWithReferral.sol";
+import {SimpleWrappedRegistrarRenewal} from "../src/SimpleWrappedRegistrarRenewal.sol";
 
 contract ReferralsTest is Test {
     INameWrapper constant NAME_WRAPPER = INameWrapper(0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401);
@@ -27,6 +28,7 @@ contract ReferralsTest is Test {
 
     UniversalRegistrarRenewalWithReferrer universalRenewal;
     WrappedRegistrarRenewalWithReferral wrappedRenewal;
+    SimpleWrappedRegistrarRenewal simpleWrappedRenewal;
 
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
@@ -39,6 +41,10 @@ contract ReferralsTest is Test {
         wrappedRenewal = new WrappedRegistrarRenewalWithReferral(
             WRAPPED_ETH_REGISTRAR_CONTROLLER,
             NAME_WRAPPER
+        );
+
+        simpleWrappedRenewal = new SimpleWrappedRegistrarRenewal(
+            WRAPPED_ETH_REGISTRAR_CONTROLLER
         );
     }
 
@@ -102,6 +108,32 @@ contract ReferralsTest is Test {
 
         // Renew
         universalRenewal.renew{value: price.base}(TEST_LEGACY_LABEL, TEST_DURATION, REFERRER);
+
+        // Assert BaseRegistrar expiry updated
+        uint256 newExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
+        assertEq(newExpiry, initialExpiry + TEST_DURATION, "BaseRegistrar expiry should be updated");
+    }
+
+    function test_simpleRenewalWrappedName() public {
+        bytes32 labelHash = keccak256(bytes(TEST_WRAPPED_LABEL));
+        uint256 labelTokenId = uint256(labelHash);
+        bytes32 node = NameCoder.namehash(NameCoder.encode(string.concat(TEST_WRAPPED_LABEL, ".eth")), 0);
+
+        // assert is Wrapped
+        assertEq(NAME_WRAPPER.isWrapped(node), true, "TEST_WRAPPED_LABEL is in NameWrapper");
+
+        // Get initial expiry from BaseRegistrar
+        uint256 initialExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
+
+        // Calculate renewal price
+        IPriceOracle.Price memory price = WRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_WRAPPED_LABEL, TEST_DURATION);
+
+        // Expect RenewalReferred event
+        vm.expectEmit(true, true, true, true);
+        emit SimpleWrappedRegistrarRenewal.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER);
+
+        // Renew
+        simpleWrappedRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
 
         // Assert BaseRegistrar expiry updated
         uint256 newExpiry = BASE_REGISTRAR.nameExpires(labelTokenId);
