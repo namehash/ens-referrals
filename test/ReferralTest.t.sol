@@ -171,7 +171,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew
         universalReferrerRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -207,7 +207,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with correct parameters
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew
         universalReferrerRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -219,7 +219,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with zero referrer
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, bytes32(0), price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), bytes32(0), price.base, TEST_DURATION);
 
         // Renew with zero referrer
         universalReferrerRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, bytes32(0));
@@ -231,7 +231,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with exact cost
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew with exact payment
         universalReferrerRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -245,7 +245,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with actual cost (not overpayment)
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew with overpayment
         universalReferrerRenewal.renew{value: totalPayment}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -261,7 +261,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with correct cost (should not include pre-existing balance)
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew with exact payment
         universalReferrerRenewal.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -279,7 +279,7 @@ contract ReferralsTest is Test {
 
         // Expect RenewalReferred event with correct cost (should not include pre-existing balance or overpayment)
         vm.expectEmit(true, true, true, true);
-        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, REFERRER, price.base, TEST_DURATION);
+        emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(keccak256(bytes(TEST_WRAPPED_LABEL)), REFERRER, price.base, TEST_DURATION);
 
         // Renew with overpayment
         universalReferrerRenewal.renew{value: totalPayment}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);

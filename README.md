@@ -38,9 +38,9 @@ If gas is a primary concern, we can save $0.13 per call by emitting a simpler `R
 ### 4. [UniversalRegistrarRenewalWithReferrer](src/UniversalRegistrarRenewalWithReferrer.sol)
 
 - **Strategy**: Direct renewal call with comprehensive referral event emission including accurate cost tracking
-- **Gas Cost**: ~123k gas for `renew()` (+35k gas @ 1 gwei @ $4500 ETH = +$0.16 per renew tx)
+- **Gas Cost**: ~122k gas for `renew()` (+34k gas @ 1 gwei @ $4500 ETH = +$0.15 per renew tx)
 
-This approach provides a balance between gas efficiency and indexer friendliness. It emits a comprehensive `RenewalReferred` event that includes the exact cost paid for the renewal, making it easy for indexers to track referral economics. The cost calculation properly handles edge cases like pre-existing contract balances and overpayments.
+This approach provides a balance between gas efficiency and indexer friendliness. It emits a comprehensive `RenewalReferred` event that includes the exact cost paid for the renewal, making it easy for indexers to track referral economics. The cost calculation properly handles edge cases like pre-existing contract balances and overpayments. The event uses an indexed `bytes32 labelHash` (keccak256 of the label) for optimal gas efficiency and filtering performance.
 
 ## Architecture
 
