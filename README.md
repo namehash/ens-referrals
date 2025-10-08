@@ -35,6 +35,13 @@ This approach emits the same `UnwrappedEthRegistrarController#NameRenewed()` eve
 
 If gas is a primary concern, we can save $0.13 per call by emitting a simpler `RenewalReferred` event in the wrapper contract and requiring that indexers do some extra work on their end to reconstitute the correct state (i.e. by correlating the simpler `RenewalReferred` event with the `WrappedEthRegistrarController#NameRenewed()` event emitted in the same transaction). This approach sacrifices indexer ergonomics to save 20k gas.
 
+### 4. [UniversalRegistrarRenewalWithReferrer](src/UniversalRegistrarRenewalWithReferrer.sol)
+
+- **Strategy**: Direct renewal call with comprehensive referral event emission including accurate cost tracking
+- **Gas Cost**: ~123k gas for `renew()` (+35k gas @ 1 gwei @ $4500 ETH = +$0.16 per renew tx)
+
+This approach provides a balance between gas efficiency and indexer friendliness. It emits a comprehensive `RenewalReferred` event that includes the exact cost paid for the renewal, making it easy for indexers to track referral economics. The cost calculation properly handles edge cases like pre-existing contract balances and overpayments.
+
 ## Architecture
 
 All contracts implement the `IRegistrarRenewalWithReferral` interface and are `Ownable` for future contract naming compatibility.
