@@ -1,7 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ENS} from "ens-contracts/registry/ENS.sol";
+import {ReverseClaimer} from "ens-contracts/reverseRegistrar/ReverseClaimer.sol";
 import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.sol";
 import {INameWrapper} from "ens-contracts/wrapper/INameWrapper.sol";
 import {IPriceOracle} from "ens-contracts/ethregistrar/IPriceOracle.sol";
@@ -20,9 +21,9 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * 4. Emitting a NameRenewed event that includes referral data for tracking purposes
  * 5. Refunding any excess payment back to the caller
  *
- * @dev This contract is Ownable to enable future contract naming compatibility.
+ * @dev This contract extends ReverseClaimer to enable future contract naming compatibility.
  */
-contract UniversalRegistrarRenewalWithAdditionalReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithAdditionalReferrerEvent is IRegistrarRenewalWithReferral, ReverseClaimer {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     INameWrapper immutable NAME_WRAPPER;
 
@@ -35,7 +36,9 @@ contract UniversalRegistrarRenewalWithAdditionalReferrerEvent is IRegistrarRenew
     /// @param referrer The referrer of the registration.
     event NameRenewed(string label, bytes32 indexed labelhash, uint256 cost, uint256 expires, bytes32 referrer);
 
-    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController, INameWrapper _nameWrapper) Ownable(msg.sender) {
+    constructor(ENS ens, IWrappedEthRegistrarController _wrappedEthRegistrarController, INameWrapper _nameWrapper)
+        ReverseClaimer(ens, msg.sender)
+    {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
         NAME_WRAPPER = _nameWrapper;
     }

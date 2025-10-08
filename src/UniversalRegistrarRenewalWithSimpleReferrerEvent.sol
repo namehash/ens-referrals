@@ -1,7 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ENS} from "ens-contracts/registry/ENS.sol";
+import {ReverseClaimer} from "ens-contracts/reverseRegistrar/ReverseClaimer.sol";
 import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.sol";
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
@@ -20,7 +21,7 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * event in the same transaction for the specified label in order to determine the duration referred
  * to attribute to the referrer in question.
  */
-contract UniversalRegistrarRenewalWithSimpleReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithSimpleReferrerEvent is IRegistrarRenewalWithReferral, ReverseClaimer {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
 
     /// @notice Emitted when a name is renewed with a referrer.
@@ -29,7 +30,7 @@ contract UniversalRegistrarRenewalWithSimpleReferrerEvent is IRegistrarRenewalWi
     /// @param referrer The referrer of the registration.
     event RenewalReferred(string label, bytes32 referrer);
 
-    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController) Ownable(msg.sender) {
+    constructor(ENS ens, IWrappedEthRegistrarController _wrappedEthRegistrarController) ReverseClaimer(ens, msg.sender) {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
     }
 

@@ -3,6 +3,7 @@ pragma solidity ~0.8.17;
 
 import {Test} from "forge-std/Test.sol";
 
+import {ENS} from "ens-contracts/registry/ENS.sol";
 import {INameWrapper} from "ens-contracts/wrapper/INameWrapper.sol";
 import {IETHRegistrarController} from "ens-contracts/ethregistrar/IETHRegistrarController.sol";
 import {IBaseRegistrar} from "ens-contracts/ethregistrar/IBaseRegistrar.sol";
@@ -15,6 +16,7 @@ import {UniversalRegistrarRenewalWithAdditionalReferrerEvent} from "../src/Unive
 import {UniversalRegistrarRenewalWithSimpleReferrerEvent} from "../src/UniversalRegistrarRenewalWithSimpleReferrerEvent.sol";
 
 contract ReferralsTest is Test {
+    ENS constant ENS_REGISTRY = ENS(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
     INameWrapper constant NAME_WRAPPER = INameWrapper(0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401);
     IWrappedEthRegistrarController constant WRAPPED_ETH_REGISTRAR_CONTROLLER =
         IWrappedEthRegistrarController(0x253553366Da8546fC250F225fe3d25d0C782303b);
@@ -43,12 +45,14 @@ contract ReferralsTest is Test {
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
 
-        universalRenewal =
-            new UniversalRegistrarRenewalWithOriginalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER);
+        universalRenewal = new UniversalRegistrarRenewalWithOriginalReferrerEvent(
+            ENS_REGISTRY, WRAPPED_ETH_REGISTRAR_CONTROLLER, UNWRAPPED_ETH_REGISTRAR_CONTROLLER
+        );
 
-        wrappedRenewal = new UniversalRegistrarRenewalWithAdditionalReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
+        wrappedRenewal =
+            new UniversalRegistrarRenewalWithAdditionalReferrerEvent(ENS_REGISTRY, WRAPPED_ETH_REGISTRAR_CONTROLLER, NAME_WRAPPER);
 
-        simpleWrappedRenewal = new UniversalRegistrarRenewalWithSimpleReferrerEvent(WRAPPED_ETH_REGISTRAR_CONTROLLER);
+        simpleWrappedRenewal = new UniversalRegistrarRenewalWithSimpleReferrerEvent(ENS_REGISTRY, WRAPPED_ETH_REGISTRAR_CONTROLLER);
     }
 
     function test_renewWrappedName() public {

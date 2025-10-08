@@ -1,7 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ~0.8.17;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ENS} from "ens-contracts/registry/ENS.sol";
+import {ReverseClaimer} from "ens-contracts/reverseRegistrar/ReverseClaimer.sol";
 import {IETHRegistrarController} from "ens-contracts/ethregistrar/IETHRegistrarController.sol";
 import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.sol";
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
@@ -23,15 +24,17 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * This approach ensures that both wrapped and unwrapped names are properly renewed with a single
  * transaction, maintaining consistency across the ENS ecosystem while preserving referral data.
  *
- * @dev This contract is Ownable to enable future contract naming compatibility.
+ * @dev This contract extends ReverseClaimer to enable future contract naming compatibility.
  */
-contract UniversalRegistrarRenewalWithOriginalReferrerEvent is IRegistrarRenewalWithReferral, Ownable {
+contract UniversalRegistrarRenewalWithOriginalReferrerEvent is IRegistrarRenewalWithReferral, ReverseClaimer {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
     IETHRegistrarController immutable UNWRAPPED_ETH_REGISTRAR_CONTROLLER;
 
-    constructor(IWrappedEthRegistrarController _wrappedEthRegistrarController, IETHRegistrarController _unwrappedEthRegistrarController)
-        Ownable(msg.sender)
-    {
+    constructor(
+        ENS ens,
+        IWrappedEthRegistrarController _wrappedEthRegistrarController,
+        IETHRegistrarController _unwrappedEthRegistrarController
+    ) ReverseClaimer(ens, msg.sender) {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
         UNWRAPPED_ETH_REGISTRAR_CONTROLLER = _unwrappedEthRegistrarController;
     }
