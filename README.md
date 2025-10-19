@@ -1,63 +1,58 @@
-# ENS Referrals Smart Contracts
+# ENS Referrals Smart Contract
 
-This repository contains smart contracts for tracking referral information during .eth subdomain domain renewals. The new `UnwrappedEthRegistrarController` emits a `NameRenewed` event that includes a `referrer` arg, but renewals for `NameWrapper`-wrapped names that go through the new `UnwrappedEthRegistrarController` would end up with their `NameWrapper` expiry out-of-sync with the `BaseRegistrar`'s.
+A contract for renewing any direct .eth subname with referral tracking.
 
-We remedy that issue by providing a `UniversalRegistrarRenewal*` contract that an integrating app can use to renew direct subnames of .eth that
-1. allows for the inclusion of the `referrer` arg, even for `NameWrapper`-wrapped names, and
-2. ensures that `NameWrapper`-wrapped names synchronize their expiry with that of the `BaseRegistrar`.
+## Overview
 
-**All** of these contract implementations are able to renew _any_ direct .eth subname with included referrer information, regardless of the EthRegistrarController they were originally registered with. They differ in their approaches to indexer ergonomics and gas costs. Integrating apps need only send direct .eth subname renewal transactions through `UniversalRegistrarRenewal*.renew()` to ensure their referral information is included for all renewals. Integrating apps could _optionally_ check the wrapped status of a name and switch between `UniversalRegistrarRenewal*.renew()` and `UnwrappedEthRegistrarController.renew()` to save users the gas cost difference on their renewal transaction.
+This project provides `UniversalRegistrarRenewalWithReferrer`, a contract that enables direct .eth subname renewals with referral tracking. The contract wraps the standard `WrappedEthRegistrarController.renew()` function to add referral event emission and accurate cost tracking, ensuring that any NameWrapper-wrapped names also have their expiry synchronized with the `BaseRegistrar`.
 
-For reference, `WrappedETHRegistrarController.renew()` costs ~88k gas.
-
-## Contracts Overview
-
-### 1. [UniversalRegistrarRenewalWithOriginalReferrerEvent](src/UniversalRegistrarRenewalWithOriginalReferrerEvent.sol)
-
-- **Strategy**: Renews through `UnwrappedEthRegistrarController` (for referral tracking using the original event) then synchronizes with `WrappedEthRegistrarController`
-- **Gas Cost**: ~129k gas for `renew()` (+41k gas @ 1 gwei @ $4500 ETH = +$0.18 per renew tx)
-
-This is the most straightforward approach: the single source-of-truth `NameRenewed` event on the `UnwrappedEthRegistrarController` is very ergonomic to index, and the additional cost-per-call is only +41k gas (+$0.18 at current pricing).
-
-**This is the approach we recommend, as it is the cleanest solution and avoids the need for more complicated indexing semantics.**
-
-### 2. [UniversalRegistrarRenewalWithAdditionalReferrerEvent](src/UniversalRegistrarRenewalWithAdditionalReferrerEvent.sol)
-
-- **Strategy**: Calculates price, renews through `WrappedEthRegistrarController`, retrieves updated expiry, emits `NameRenewed`
-- **Gas Cost**: ~136k gas for `renew()` (+48k gas @ 1 gwei @ $4500 ETH = +$0.22 per renew tx)
-
-This approach emits the same `UnwrappedEthRegistrarController#NameRenewed()` event without calling `UnwrappedEthRegistrarController` but the gas required to (re)calculate the price makes it cost more than `UniversalRegistrarRenewalWithOriginalReferrerEvent.renew()`.
-
-### 3. [UniversalRegistrarRenewalWithSimpleReferrerEvent](src/UniversalRegistrarRenewalWithSimpleReferrerEvent.sol)
-
-- **Strategy**: Direct renewal call with basic referral event emission
-- **Gas Cost**: ~109k gas for `renew()` (+21k gas @ 1 gwei @ $4500 ETH = +$0.09 per renew tx)
-
-If gas is a primary concern, we can save $0.13 per call by emitting a simpler `RenewalReferred` event in the wrapper contract and requiring that indexers do some extra work on their end to reconstitute the correct state (i.e. by correlating the simpler `RenewalReferred` event with the `WrappedEthRegistrarController#NameRenewed()` event emitted in the same transaction). This approach sacrifices indexer ergonomics to save 20k gas.
-
-### 4. [UniversalRegistrarRenewalWithReferrer](src/UniversalRegistrarRenewalWithReferrer.sol)
-
-- **Strategy**: Direct renewal call with comprehensive referral event emission including accurate cost tracking
-- **Gas Cost**: ~122k gas for `renew()` (+34k gas @ 1 gwei @ $4500 ETH = +$0.15 per renew tx)
-
-This approach provides a balance between gas efficiency and indexer friendliness. It emits a comprehensive `RenewalReferred` event that includes the exact cost paid for the renewal, making it easy for indexers to track referral economics. The cost calculation properly handles edge cases like pre-existing contract balances and overpayments. The event uses an indexed `bytes32 labelHash` (keccak256 of the label) for optimal gas efficiency and filtering performance.
-
-## Architecture
-
-All contracts implement the `IRegistrarRenewalWithReferral` interface and are `Ownable` for future contract naming compatibility.
+It balances implementation clarity, user gas cost, and indexer logic based on exploration with the ENS team. It emits a `RenewalReferred` event with the following ABI:
 
 ```solidity
-//SPDX-License-Identifier: MIT
-pragma solidity ~0.8.17;
-
-interface IRegistrarRenewalWithReferral {
-    function renew(string calldata label, uint256 duration, bytes32 referrer) external payable;
-}
+/// @notice Emitted when a name is renewed with a referrer.
+///
+/// @param label The .eth subname label
+/// @param labelHash The keccak256 hash of the .eth subname label
+/// @param cost The actual cost of the renewal
+/// @param duration The duration of the renewal
+/// @param referrer The referrer of the renewal
+event RenewalReferred(
+    string label,
+    bytes32 indexed labelHash,
+    uint256 cost,
+    uint256 duration,
+    bytes32 referrer
+);
 ```
 
-### Quick Start
+Note that we use `duration` over `expiry` (as found in `UnwrappedEthRegistrarController#NameRenewed()`) to avoid the gas costs of an additional read.
+
+The `UniversalRegistrarRenewalWithReferrer.renew()` method has an identical ABI to `UnwrappedEthRegistrarController.renew()`: integrating applications need only send renewal transactions to `UniversalRegistrarRenewalWithReferrer` instead of `UnwrappedEthRegistrarController` to ensure that renewals of _all_ direct .eth subnames include referral tracking.
+
+```solidity
+function renew(string calldata label, uint256 duration, bytes32 referrer) external payable
+```
+
+### Setup
 
 ```bash
 forge install
+forge build
 forge test
+```
+
+### Key Commands
+
+```bash
+# Build contracts
+forge build
+
+# Run tests
+forge test
+
+# Format code
+forge fmt
+
+# Gas reporting
+forge test --gas-report
 ```
