@@ -6,8 +6,11 @@ libs = ["lib"]
 # Mainnet forking configuration
 [rpc_endpoints]
 mainnet = "${MAINNET_RPC_URL}"
+sepolia = "${SEPOLIA_RPC_URL}"
 
 [fmt]
 line_length = 140
 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[etherscan]
+mainnet = { key = "${ETHERSCAN_API_KEY}" }
+sepolia = { key = "${ETHERSCAN_API_KEY}" }

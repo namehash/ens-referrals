@@ -38,21 +38,34 @@ function renew(string calldata label, uint256 duration, bytes32 referrer) extern
 ```bash
 forge install
 forge build
-forge test
 ```
 
-### Key Commands
+Copy `.env.example` to `.env` and configure your environment variables:
 
 ```bash
-# Build contracts
-forge build
-
-# Run tests
-forge test
-
-# Format code
-forge fmt
-
-# Gas reporting
-forge test --gas-report
+cp .env.example .env
+# Edit .env with your values
 ```
+
+Required environment variables:
+- `MAINNET_RPC_URL`: RPC endpoint for mainnet (tests use mainnet fork)
+- `PRIVATE_KEY`: Private key for deployment (optional, for deployment only)
+
+```bash
+# Run tests (requires MAINNET_RPC_URL)
+forge test
+```
+
+## Deployment
+
+Deploy to mainnet or Sepolia:
+
+```bash
+# Deploy to mainnet
+forge script script/Deploy.s.sol --rpc-url mainnet -vvvv --interactives 1 --broadcast --verify
+
+# Deploy to sepolia
+forge script script/Deploy.s.sol --rpc-url sepolia -vvvv --interactives 1 --broadcast --verify
+```
+
+The script automatically detects the network and uses the appropriate ENS and controller addresses.
