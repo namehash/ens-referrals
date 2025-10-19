@@ -2,7 +2,6 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-gas_reports = ["UniversalRegistrarRenewalWithOriginalReferrerEvent", "UniversalRegistrarRenewalWithAdditionalReferrerEvent", "UniversalRegistrarRenewalWithSimpleReferrerEvent"]
 
 # Mainnet forking configuration
 [rpc_endpoints]

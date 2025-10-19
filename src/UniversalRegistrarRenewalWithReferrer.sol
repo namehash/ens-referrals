@@ -7,12 +7,12 @@ import {IWrappedEthRegistrarController} from "./IWrappedEthRegistrarController.s
 import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol";
 
 /**
- * @title UniversalRegistrarRenewalWithSimpleReferrerEvent
- * @notice A simplified contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
+ * @title UniversalRegistrarRenewalWithReferrer
+ * @notice A contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
  *
  * This contract provides a simplified renewal process that:
  * 1. Calls WRAPPED_ETH_REGISTRAR_CONTROLLER.renew()
- * 2. Emits the RenewalReferred event
+ * 2. Emits the RenewalReferred event with both label and indexed labelHash for searchability
  * 3. Refunds the sender
  */
 contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral, ReverseClaimer {
@@ -20,9 +20,12 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
 
     /// @notice Emitted when a name is renewed with a referrer.
     ///
+    /// @param label The .eth subname label
     /// @param labelHash The keccak256 hash of the .eth subname label
-    /// @param referrer The referrer of the registration.
-    event RenewalReferred(bytes32 indexed labelHash, bytes32 referrer, uint256 cost, uint256 duration);
+    /// @param cost The actual cost of the renewal
+    /// @param duration The duration of the renewal
+    /// @param referrer The referrer of the renewal
+    event RenewalReferred(string label, bytes32 indexed labelHash, uint256 cost, uint256 duration, bytes32 referrer);
 
     constructor(ENS ens, IWrappedEthRegistrarController _wrappedEthRegistrarController) ReverseClaimer(ens, msg.sender) {
         WRAPPED_ETH_REGISTRAR_CONTROLLER = _wrappedEthRegistrarController;
@@ -32,22 +35,24 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
      * @notice Renews an ENS name with referral tracking
      * @param label The label of the .eth subname to renew
      * @param duration The duration to extend the registration
-     * @param referrer The referrer for tracking purposes
+     * @param referrer The referrer of the renewal
      * @dev Gas usage: ~122k
      */
     function renew(string calldata label, uint256 duration, bytes32 referrer) external payable {
+        // 1. Call WRAPPED_ETH_REGISTRAR_CONTROLLER.renew() & infer cost
         uint256 prevBalance = address(this).balance;
+        WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: prevBalance}(label, duration);
+        uint256 currBalance = address(this).balance;
+        uint256 cost = prevBalance - currBalance;
 
-        // 1. Call WRAPPED_ETH_REGISTRAR_CONTROLLER.renew()
-        WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration);
+        // 2. Emit the RenewalReferred event with actual cost spent and indexed labelHash for searchability
+        // NOTE: we emit `duration` instead of `expiry` to avoid the gas cost of reading the new
+        // expiry from the Registry
+        emit RenewalReferred(label, keccak256(bytes(label)), cost, duration, referrer);
 
-        // 2. Emit the RenewalReferred event with actual cost spent
-        uint256 cost = prevBalance - address(this).balance;
-        emit RenewalReferred(keccak256(bytes(label)), referrer, cost, duration);
-
-        // 3. Refund sender
-        if (address(this).balance > 0) {
-            payable(msg.sender).transfer(address(this).balance);
+        // 3. Refund sender any unspent wei, along with any excess contract balance
+        if (currBalance > 0) {
+            payable(msg.sender).transfer(currBalance);
         }
     }
 
