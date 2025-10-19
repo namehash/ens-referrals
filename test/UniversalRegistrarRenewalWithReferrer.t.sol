@@ -29,12 +29,22 @@ contract ReferralsTest is Test {
     // forge-lint: disable-next-line(mixed-case-variable)
     bytes32 REFERRER = keccak256("test-referrer"); // TODO: referrer formatting
 
+    address renewer = vm.addr(1239586324895);
     UniversalRegistrarRenewalWithReferrer renewalContract;
 
     function setUp() public {
         vm.createSelectFork(vm.envString("MAINNET_RPC_URL"));
 
         renewalContract = new UniversalRegistrarRenewalWithReferrer(ENS_REGISTRY, WRAPPED_ETH_REGISTRAR_CONTROLLER);
+
+        // set renewalContract's balance to 0 because this address on mainnet has a balance
+        vm.deal(address(renewalContract), 0);
+        assertEq(address(renewalContract).balance, 0, "Must start with 0 excess balance");
+
+        vm.deal(renewer, 10 ether);
+        assertEq(renewer.balance, 10 ether, "Must start with dealt balance");
+
+        vm.startPrank(renewer);
     }
 
     function test_renewWrappedName() public {
@@ -60,8 +70,8 @@ contract ReferralsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_WRAPPED_LABEL, labelHash, price.base, TEST_DURATION, REFERRER);
 
-        // Expect Overpayment Refund
-        vm.expectCall(address(this), overpayment, "");
+        // Expect Refund
+        vm.expectCall(address(renewer), overpayment, "");
 
         // Renew
         renewalContract.renew{value: price.base + overpayment}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -90,8 +100,8 @@ contract ReferralsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_UNWRAPPED_LABEL, labelHash, price.base, TEST_DURATION, REFERRER);
 
-        // Expect Overpayment Refund
-        vm.expectCall(address(this), overpayment, "");
+        // Expect Refund
+        vm.expectCall(address(renewer), overpayment, "");
 
         // Renew
         renewalContract.renew{value: price.base + overpayment}(TEST_UNWRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -116,8 +126,8 @@ contract ReferralsTest is Test {
         vm.expectEmit(true, true, true, true);
         emit UniversalRegistrarRenewalWithReferrer.RenewalReferred(TEST_LEGACY_LABEL, labelHash, price.base, TEST_DURATION, REFERRER);
 
-        // Expect Overpayment Refund
-        vm.expectCall(address(this), overpayment, "");
+        // Expect Refund
+        vm.expectCall(address(renewer), overpayment, "");
 
         // Renew
         renewalContract.renew{value: price.base + overpayment}(TEST_LEGACY_LABEL, TEST_DURATION, REFERRER);
@@ -138,9 +148,9 @@ contract ReferralsTest is Test {
         );
 
         // Expect No Refund
-        vm.expectCall(address(this), "", 0);
+        vm.expectCall(address(renewer), 0, "", 0);
 
-        // Renew with zero referrer
+        // Renew
         renewalContract.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, bytes32(0));
     }
 
@@ -155,7 +165,7 @@ contract ReferralsTest is Test {
         );
 
         // Expect No Refund
-        vm.expectCall(address(this), "", 0);
+        vm.expectCall(address(renewer), 0, "", 0);
 
         // Renew
         renewalContract.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
@@ -175,10 +185,10 @@ contract ReferralsTest is Test {
             TEST_WRAPPED_LABEL, keccak256(bytes(TEST_WRAPPED_LABEL)), price.base, TEST_DURATION, REFERRER
         );
 
-        // Expect Excess Refund
-        vm.expectCall(address(this), excessBalance, "");
+        // Expect Refund
+        vm.expectCall(address(renewer), excessBalance, "");
 
-        // Renew with exact payment
+        // Renew
         renewalContract.renew{value: price.base}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
     }
 
@@ -186,6 +196,7 @@ contract ReferralsTest is Test {
         // Send some ETH to the contract before renewal
         uint256 excessBalance = 0.01 ether;
         payable(address(renewalContract)).transfer(excessBalance);
+        assertEq(address(renewalContract).balance, excessBalance, "Must have recieved excess");
 
         // Calculate renewal price and add overpayment
         IPriceOracle.Price memory price = WRAPPED_ETH_REGISTRAR_CONTROLLER.rentPrice(TEST_WRAPPED_LABEL, TEST_DURATION);
@@ -197,12 +208,10 @@ contract ReferralsTest is Test {
             TEST_WRAPPED_LABEL, keccak256(bytes(TEST_WRAPPED_LABEL)), price.base, TEST_DURATION, REFERRER
         );
 
-        // Expect Excess + Overpayment Refund
-        vm.expectCall(address(this), excessBalance + overpayment, "");
+        // Expect Refund
+        vm.expectCall(address(renewer), excessBalance + overpayment, "");
 
-        // Renew with overpayment
+        // Renew
         renewalContract.renew{value: price.base + overpayment}(TEST_WRAPPED_LABEL, TEST_DURATION, REFERRER);
     }
-
-    receive() external payable {}
 }

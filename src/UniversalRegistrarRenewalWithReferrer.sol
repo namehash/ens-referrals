@@ -11,9 +11,12 @@ import {IRegistrarRenewalWithReferral} from "./IRegistrarRenewalWithReferral.sol
  * @notice A contract for renewing ENS names via the WrappedEthRegistrarController with referral tracking.
  *
  * This contract provides a simplified renewal process that:
- * 1. Calls WRAPPED_ETH_REGISTRAR_CONTROLLER.renew()
- * 2. Emits the RenewalReferred event with both label and indexed labelHash for searchability
- * 3. Refunds the sender
+ * 1. Calls WRAPPED_ETH_REGISTRAR_CONTROLLER.renew(),
+ * 2. Emits the RenewalReferred event for referral tracking, and
+ * 3. Refunds the sender any overpayment.
+ *
+ * To use, replace UnwrappedEthRegistrarController.renew() with UniversalRegistrarRenewalWithReferrer.renew()
+ * and all renewal transactions will include the referrer event.
  */
 contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral, ReverseClaimer {
     IWrappedEthRegistrarController immutable WRAPPED_ETH_REGISTRAR_CONTROLLER;
@@ -36,12 +39,12 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
      * @param label The label of the .eth subname to renew
      * @param duration The duration to extend the registration
      * @param referrer The referrer of the renewal
-     * @dev Gas usage: ~122k
+     * @dev Gas usage: ~117k
      */
     function renew(string calldata label, uint256 duration, bytes32 referrer) external payable {
         // 1. Call WRAPPED_ETH_REGISTRAR_CONTROLLER.renew() & infer cost
         uint256 prevBalance = address(this).balance;
-        WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: prevBalance}(label, duration);
+        WRAPPED_ETH_REGISTRAR_CONTROLLER.renew{value: msg.value}(label, duration);
         uint256 currBalance = address(this).balance;
         uint256 cost = prevBalance - currBalance;
 
@@ -50,9 +53,10 @@ contract UniversalRegistrarRenewalWithReferrer is IRegistrarRenewalWithReferral,
         // expiry from the Registry
         emit RenewalReferred(label, keccak256(bytes(label)), cost, duration, referrer);
 
-        // 3. Refund sender any unspent wei, along with any excess contract balance
+        // 3. Refund sender contract balance
         if (currBalance > 0) {
-            payable(msg.sender).transfer(currBalance);
+            (bool success,) = msg.sender.call{value: currBalance}("");
+            require(success, "ETH transfer failed");
         }
     }
 
