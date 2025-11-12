@@ -6,7 +6,7 @@ A contract for renewing any direct .eth subname with referral tracking.
 
 This project provides `UniversalRegistrarRenewalWithReferrer`, a contract that enables direct .eth subname renewals with referral tracking. The contract wraps the standard `WrappedEthRegistrarController.renew()` function to add referral event emission and accurate cost tracking, ensuring that any NameWrapper-wrapped names also have their expiry synchronized with the `BaseRegistrar`.
 
-It balances implementation clarity, user gas cost, and indexer logic based on exploration with the ENS team. It emits a `RenewalReferred` event with the following ABI:
+It balances implementation clarity, user gas cost, and indexer logic based on exploration with the ENS Labs team. It emits a `RenewalReferred` event with the following ABI:
 
 ```solidity
 /// @notice Emitted when a name is renewed with a referrer.
@@ -69,3 +69,10 @@ forge script script/Deploy.s.sol --rpc-url sepolia -vvvv --interactives 1 --broa
 ```
 
 The script automatically detects the network and uses the appropriate ENS and controller addresses.
+
+## Existing Deployments
+
+| Chain            | Address |
+|------------------|---------|
+| Ethereum Mainnet | [0xf55575Bde5953ee4272d5CE7cdD924c74d8fA81A](https://etherscan.io/address/0xf55575Bde5953ee4272d5CE7cdD924c74d8fA81A#code) |
+| Ethereum Sepolia | [0x7AB2947592C280542e680Ba8f08A589009da8644](https://sepolia.etherscan.io/address/0x7AB2947592C280542e680Ba8f08A589009da8644#code) |
