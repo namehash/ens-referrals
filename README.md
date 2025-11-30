@@ -10,7 +10,7 @@ The ENS Holiday Awards are designed as a time and budget constrained trial. This
 
 More details can be found in the [Program Rules for ENS Holiday Awards](https://ensawards.org/ens-holiday-awards-rules).
 
-## Developer Implementation Guide
+## Developer Integration Guide
 
 Developers can participate in the ENS Holiday Awards program through referral hyperlinks or through onchain referrals at the smart-contract level.
 
