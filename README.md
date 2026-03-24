@@ -42,7 +42,7 @@ Onchain referrals for the registration / renewal of a direct subname of ".eth" s
 The "referrer" parameter passed to the register / renew calls on the above contracts is a 32-byte value, while an Ethereum address is a 20-byte value. Therefore, to qualify for this program, the "referrer" parameter must match the following format:
 * First 12-bytes: all zeros.
 * Last 20-bytes: Ethereum mainnet address identifying the Referrer and where any Award Distributions the Referrer may earn will be deposited.
-* Related utility functions for encoding / decoding referrer address values for use onchain can be found [here](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src/v1).
+* Related utility functions for encoding / decoding referrer address values for use onchain can be found [here](https://github.com/namehash/ensnode/blob/main/packages/ensnode-sdk/src/registrars/encoded-referrer.ts).
 
 ### ENS Referral Program Rule Implementation
 
@@ -50,7 +50,7 @@ Logic implementing the `ENS Referral Program Rules` (all editions) is fully open
 
 ### ENS Referral Program APIs
 
-[ENSNode](https://ensnode.io/) v1.1.0+ offers APIs for querying ENS Referral Program leaderboards, referral metrics for specific referrers, and overall editions information. The easiest way to query these APIs is through the ENSNode client library as seen [here](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src/v1). For more information [read the client docs](https://github.com/namehash/ensnode/blob/main/packages/ens-referrals/README.md).
+[ENSNode](https://ensnode.io/) v1.7.0+ offers APIs for querying ENS Referral Program leaderboards, referral metrics for specific referrers, and overall editions information. The easiest way to query these APIs is through the ENSNode client library as seen [here](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src/v1). For more information [read the client docs](https://github.com/namehash/ensnode/blob/main/packages/ens-referrals/README.md).
 
 # UniversalRegistrarRenewalWithReferrer
 
