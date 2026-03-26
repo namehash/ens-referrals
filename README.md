@@ -1,8 +1,8 @@
-# ENS Referral Program
+# ENS Referral Program: Developer Resources
 
-[ENS Referral Program](https://ensawards.org/ens-referral-program) is an incentive framework designed to distribute awards for referred .eth name registrations and renewals. It is currently being rolled out as a series of time-limited editions, with the long-term goal of refining its rules and mechanisms before launching a continuous, indefinite program.
+The [ENS Referral Program](https://ensawards.org/ens-referral-program) is an incentive framework designed to distribute awards for referred .eth name registrations and renewals. It is being rolled out as a series of time-limited editions to refine its rules and mechanisms, with the goal of launching a long-term ENS Referral Program.
 
-So far, we have launched the `ENS Holiday Awards` edition (see details [here](https://ensawards.org/ens-referral-program/editions/2025-12/rules)) and are preparing more refined editions for `April 2026` and `May 2026`. Additional details will be announced soon.
+So far, we have launched the `ENS Holiday Awards` edition (see details [here](https://ensawards.org/ens-referral-program/editions/2025-12/leaderboard)) and are preparing more refined editions for `April 2026` and `May 2026`. Additional details will be announced soon.
 
 These efforts are part of our SPP2 deliverables to the ENS DAO, which include our commitment to ultimately fund $50,000 USD in ENS Referral Program awards throughout the duration of SPP2.
 
@@ -14,13 +14,13 @@ Developers can participate in any ENS Referral Program edition through referral 
 
 Simply integrate referral links into your apps and websites. For example: Consider notifying your users of the .eth names they own and that will expire soon if not renewed.
 
-[Generate your ENS Referral Program Link](https://ensawards.org/ens-referral-awards)
+[Generate your ENS Referral Program Link](https://ensawards.org/ens-referral-program#generate-referral-link)
 
 ### Onchain Referrals
 
 Integrate directly with ENS smart contracts for full flexibility and control over the user journey. Build the ultimate .eth name registration and renewal features directly into your app or wallet.
 
-Onchain referrals for the registration / renewal of a direct subname of ".eth" should be implemented using the following contracts within the duration of any ENS Referral Program edition:
+Onchain referrals for the registration / renewal of a direct subname of ".eth" should be implemented using the following contracts within the duration of any of the announced ENS Referral Program editions:
 
 #### UnwrappedEthRegistrarController
 
@@ -50,7 +50,7 @@ Logic implementing the `ENS Referral Program Rules` (all editions) is fully open
 
 ### ENS Referral Program APIs
 
-[ENSNode](https://ensnode.io/) v1.7.0+ offers APIs for querying ENS Referral Program leaderboards, referral metrics for specific referrers, and overall editions information. The easiest way to query these APIs is through the ENSNode client library as seen [here](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src/v1). For more information [read the client docs](https://github.com/namehash/ensnode/blob/main/packages/ens-referrals/README.md).
+[ENSNode](https://ensnode.io/) v1.7.0+ offers APIs for querying ENS Referral Program leaderboards, referral metrics for specific referrers, and overall editions information. The recommended way to query these APIs is through the [ENS referrals client library](https://github.com/namehash/ensnode/blob/main/packages/ens-referrals/README.md).
 
 # UniversalRegistrarRenewalWithReferrer
 
