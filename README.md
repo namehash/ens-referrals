@@ -2,7 +2,7 @@
 
 The [ENS Referral Program](https://ensawards.org/ens-referral-program) is an incentive framework designed to distribute awards for referred .eth name registrations and renewals. It is being rolled out as a series of time-limited editions to refine its rules and mechanisms, with the goal of launching a long-term ENS Referral Program.
 
-So far, we have launched the `ENS Holiday Awards` edition (see details [here](https://ensawards.org/ens-referral-program/editions/2025-12/leaderboard)) and are preparing more refined editions for `April 2026` and `May 2026`. Additional details will be announced soon.
+So far, we have launched the `ENS Holiday Awards` edition (see details [here](https://ensawards.org/ens-referral-program/editions/2025-12/leaderboard)) and are preparing more refined editions for [April 2026](https://ensawards.org/ens-referral-program/editions/2026-04/leaderboard) and [May 2026](https://ensawards.org/ens-referral-program/editions/2026-05/leaderboard). Additional details will be announced soon.
 
 These efforts are part of our SPP2 deliverables to the ENS DAO, which include our commitment to ultimately fund $50,000 USD in ENS Referral Program awards throughout the duration of SPP2.
 
