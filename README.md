@@ -37,6 +37,25 @@ Onchain referrals for the registration / renewal of a direct subname of ".eth" s
 * [Mainnet deployment](https://etherscan.io/address/0xf55575Bde5953ee4272d5CE7cdD924c74d8fA81A)
 * [Sepolia deployment](https://sepolia.etherscan.io/address/0x7AB2947592C280542e680Ba8f08A589009da8644) (useful for testing, but no ENS Referral Program award distributions will be made on Sepolia)
 
+#### BulkRenewalWithReferral
+
+* Developed and deployed by [Grails market](https://grails.app/).
+* Supports bulk referred renewals.
+* Source code is available [here](https://github.com/grailsmarket/ens-referrals/blob/main/src/BulkRenewalWithReferral.sol).
+* [Mainnet deployment](https://etherscan.io/address/0xafc5a354a159dc900bb9ea1082d3e20a3cd65026)
+
+> **NOTE**: This contract has not yet been reviewed by the NameHash Labs team and is provided for reference only. Exercise additional caution when using it in your integrations.
+
+#### AdvancedBulkRenewal
+
+* Developed and deployed by [liubenben.eth](https://app.ens.domains/liubenben.eth) of [ENSBook](https://www.ensbook.xyz/home).
+* Supports bulk referred renewals.
+* Full details can be found in the [launch announcement on the ENS Discussion Forum](https://discuss.ens.domains/t/advancedbulkrenewal-a-stateless-contract-for-flexible-duration-bulk-renewals-live-on-ensbook/21826).
+* Source code is available [here](https://github.com/hibbb/advanced-bulk-renewal/blob/main/contracts/AdvancedBulkRenewal.sol).
+* [Mainnet deployment](https://etherscan.io/address/0x0735086b17D590c19907E88B6915ecDf47Fe8D88)
+
+> **NOTE**: This contract has not yet been reviewed by the NameHash Labs team and is provided for reference only. Exercise additional caution when using it in your integrations.
+
 #### "referrer" parameter values
 
 The "referrer" parameter passed to the register / renew calls on the above contracts is a 32-byte value, while an Ethereum address is a 20-byte value. Therefore, to qualify for this program, the "referrer" parameter must match the following format:
