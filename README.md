@@ -2,7 +2,7 @@
 
 The [ENS Referral Program](https://ensawards.org/ens-referral-program) is an incentive framework designed to distribute awards for referred .eth name registrations and renewals. It is being rolled out as a series of time-limited editions to refine its rules and mechanisms, with the goal of launching a long-term ENS Referral Program.
 
-So far, we have launched the `ENS Holiday Awards` edition (see details [here](https://ensawards.org/ens-referral-program/editions/2025-12/leaderboard)), followed by a more refined edition for [April 2026](https://ensawards.org/ens-referral-program/editions/2026-04/leaderboard), and we are now preparing our largest edition yet for [May 2026](https://ensawards.org/ens-referral-program/editions/2026-05/leaderboard). Additional details will be announced soon.
+So far, we have launched the [ENS Holiday Awards edition](https://ensawards.org/ens-referral-program/editions/2025-12/leaderboard), the [April 2026 edition](https://ensawards.org/ens-referral-program/editions/2026-04/leaderboard), and the [May 2026 edition](https://ensawards.org/ens-referral-program/editions/2026-05/leaderboard). Plans for the next editions to follow are under active development and will be announced soon.
 
 These efforts are part of our SPP2 deliverables to the ENS DAO, which include our commitment to ultimately fund $50,000 USD in ENS Referral Program awards throughout the duration of SPP2.
 
@@ -65,7 +65,7 @@ The "referrer" parameter passed to the register / renew calls on the above contr
 
 ### ENS Referral Program Rule Implementation
 
-Logic implementing the `ENS Referral Program Rules` (all editions) is fully open source and can be found [here](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src/v1).
+Logic implementing the `ENS Referral Program Rules` (all editions) is fully open source and can be found [in the ENSNode monorepo's ens-referrals package](https://github.com/namehash/ensnode/tree/main/packages/ens-referrals/src).
 
 ### ENS Referral Program APIs
 
